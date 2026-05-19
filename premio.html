@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>egreen.ai — A IA que decodificou as Apostas Esportivas</title>
+    <meta name="description" content="Acesse a inteligência artificial que lê as melhores oportunidades do Futebol e eSoccer em tempo real." />
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Meta Pixel Code (eGreen) -->
+    <script>
+        !function(f,b,e,v,n,t,s)
+        {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+        n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+        if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+        n.queue=[];t=b.createElement(e);t.async=!0;
+        t.src=v;s=b.getElementsByTagName(e)[0];
+        s.parentNode.insertBefore(t,s)}(window, document,'script',
+        'https://connect.facebook.net/en_US/fbevents.js');
+        fbq('init', '756953347467899');
+        fbq('track', 'PageView');
+    </script>
+    <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=756953347467899&ev=PageView&noscript=1"/></noscript>
+    <!-- End Meta Pixel Code -->
+
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { overflow-x: hidden; max-width: 100%; }
+        html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #121212; color: #F3F4F6; line-height: 1.6;
+            font-weight: 500; -webkit-font-smoothing: antialiased;
+            padding-top: 56px;
+        }
+        @media(max-width: 480px) { body { padding-top: 50px; } }
+        img { max-width: 100%; display: block; height: auto; }
+        a { color: inherit; text-decoration: none; }
+        button { font-family: inherit; cursor: pointer; border: 0; }
+
+        :root {
+            --egreen: #00FF00;
+            --egreen-dark: #00CC00;
+            --dark: #121212;
+            --dark2: #1E1E1E;
+            --dark3: #2A2A2A;
+            --container: 1100px;
+            --muted: #9CA3AF;
+        }
+
+        .container { width: 100%; max-width: var(--container); margin: 0 auto; padding: 0 24px; }
+        section { padding: 72px 0; }
+        @media(max-width: 640px) { section { padding: 52px 0; } }
+
+        /* ══ TOPBAR ══ */
+        .topbar {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 8000;
+            background: var(--egreen);
+        }
+        .topbar .inner {
+            max-width: var(--container); margin: 0 auto;
+            display: flex; align-items: center; justify-content: center; gap: 14px;
+            padding: 10px 16px; flex-wrap: wrap;
+        }
+        .topbar .tb-label {
+            font-family: 'Bebas Neue', 'Impact', sans-serif;
+            font-weight: 700; color: #000; font-size: 16px;
+            text-transform: uppercase; letter-spacing: 0.8px; white-space: nowrap;
+        }
+        .topbar .cd-pill {
+            display: flex; align-items: center; gap: 6px;
+            background: #000; border-radius: 100px; padding: 5px 14px;
+        }
+        .cd-pill .cd-lbl { font-size: 11px; color: var(--egreen); text-transform: uppercase; letter-spacing: 0.1em; white-space: nowrap; }
+        .cd-pill .cd-time {
+            font-family: 'Bebas Neue', 'Impact', sans-serif;
+            font-size: 18px; color: #FFF; font-weight: 700; letter-spacing: 0.08em;
+        }
+        @media(max-width: 480px) {
+            .topbar .tb-label { font-size: 13px; }
+            .cd-pill .cd-time { font-size: 15px; }
+        }
+
+        /* ══ CTA BUTTONS ══ */
+        .btn-green {
+            display: block; width: 100%; max-width: 580px;
+            background: linear-gradient(135deg, #00FF00 0%, #66FF66 50%, #00FF00 100%);
+            background-size: 200% auto;
+            color: #000;
+            font-family: 'Bebas Neue', 'Impact', sans-serif;
+            font-weight: 700; text-transform: uppercase; letter-spacing: 2px;
+            padding: 24px 36px; border-radius: 14px;
+            font-size: clamp(20px, 5.5vw, 28px);
+            border: 2px solid rgba(0, 255, 0, 0.5);
+            box-shadow: 0 8px 0 #009900, 0 0 0 4px rgba(0, 255, 0, 0.2), 0 20px 50px rgba(0, 255, 0, 0.3);
+            transition: transform 0.15s, box-shadow 0.15s, background-position 0.4s;
+            line-height: 1.1; cursor: pointer; text-align: center;
+            margin: 0 auto; position: relative; overflow: hidden;
+        }
+        .btn-green::after {
+            content: ''; position: absolute; top: 0; left: -100%; width: 60%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+            transform: skewX(-20deg);
+            animation: shimmer 2.8s infinite;
+        }
+        @keyframes shimmer { 0% { left: -100%; } 60% { left: 140%; } 100% { left: 140%; } }
+        .btn-green:hover {
+            transform: translateY(-4px); background-position: right center;
+            box-shadow: 0 12px 0 #009900, 0 0 0 6px rgba(0, 255, 0, 0.3), 0 28px 60px rgba(0, 255, 0, 0.5);
+        }
+        .btn-green:active { transform: translateY(3px); box-shadow: 0 3px 0 #009900; }
+        .btn-pulse { animation: ppulse 2.2s infinite; }
+        @keyframes ppulse {
+            0% { box-shadow: 0 8px 0 #009900, 0 0 0 0 rgba(0, 255, 0, 0.7), 0 20px 50px rgba(0, 255, 0, 0.3); }
+            60% { box-shadow: 0 8px 0 #009900, 0 0 0 20px rgba(0, 255, 0, 0), 0 20px 50px rgba(0, 255, 0, 0.3); }
+            100% { box-shadow: 0 8px 0 #009900, 0 0 0 0 rgba(0, 255, 0, 0), 0 20px 50px rgba(0, 255, 0, 0.3); }
+        }
+        .btn-wrap { margin-top: 28px; display: flex; justify-content: center; }
+
+        /* ══ HERO ══ */
+        .hero {
+            background: var(--dark); padding: 52px 0 64px;
+            position: relative; overflow: hidden;
+        }
+        .hero::after {
+            content: ''; position: absolute; top: 0; right: 0; width: 55%; height: 100%;
+            background: radial-gradient(ellipse at 80% 50%, rgba(0, 255, 0, 0.08) 0%, transparent 65%);
+            pointer-events: none;
+        }
+        .bg-grid-pattern {
+            position: absolute; inset: 0;
+            background-image: radial-gradient(#1f2937 1px, transparent 1px);
+            background-size: 20px 20px; opacity: 0.15; pointer-events: none; z-index: 0;
+        }
+        .hero-grid { display: grid; grid-template-columns: 1fr; gap: 44px; align-items: center; position: relative; z-index: 10;}
+        @media(min-width: 768px) {
+            .hero { padding: 68px 0 80px; }
+            .hero-grid { grid-template-columns: 1.1fr 0.9fr; gap: 56px; }
+        }
+
+        .hero-text { text-align: center; }
+        @media(min-width: 768px) { .hero-text { text-align: left; } }
+
+        .hero-text .eyebrow {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: #1A1A1A; border: 1px solid #333; color: #FFF;
+            font-family: 'Bebas Neue', 'Impact', sans-serif; font-weight: 700;
+            padding: 7px 18px; border-radius: 8px;
+            font-size: 16px; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 22px;
+        }
+        .hero-text h1 {
+            font-family: 'Bebas Neue', 'Impact', sans-serif; font-weight: 700;
+            text-transform: uppercase; line-height: 0.93;
+            font-size: clamp(38px, 9vw, 68px); color: #fff; margin-bottom: 16px;
+        }
+        .hero-text h1 .accent { color: var(--egreen); text-shadow: 0 0 15px rgba(0, 255, 0, 0.4); }
+        .hero-text .hero-sub { color: var(--muted); font-size: 18px; line-height: 1.65; max-width: 480px; margin-bottom: 0; }
+        @media(max-width: 767px) { .hero-text .hero-sub { margin: 0 auto; } }
+
+        /* Video / Photo Wrap */
+        .hero-photo-wrap {
+            border-radius: 16px; overflow: hidden; position: relative;
+            box-shadow: 0 28px 72px rgba(0, 0, 0, 0.8), 0 0 0 2px rgba(0, 255, 0, 0.2);
+            background: #000; aspect-ratio: 16/9;
+        }
+        .hero-photo-wrap iframe { width: 100%; height: 100%; position: absolute; top: 0; left: 0; }
+
+        /* ══ STATS ══ */
+        .stats-bar {
+            background: var(--dark2);
+            border-top: 2px solid rgba(0, 255, 0, 0.12);
+            border-bottom: 2px solid rgba(0, 255, 0, 0.12);
+            padding: 32px 0; position: relative; z-index: 10;
+        }
+        .stats-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+            max-width: 800px; margin: 0 auto; text-align: center;
+        }
+        .sn { font-family: 'Bebas Neue', 'Impact', sans-serif; font-size: clamp(28px, 6vw, 48px); color: var(--egreen); line-height: 1; font-weight: 700; }
+        .sl { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-top: 4px; }
+
+        /* ══ PROBLEMA ══ */
+        .section-problem { background: var(--dark); position: relative; z-index: 10;}
+        .problem-wrap { max-width: 860px; margin: 0 auto; text-align: center; }
+        .section-title {
+            font-family: 'Bebas Neue', 'Impact', sans-serif; font-weight: 700; text-transform: uppercase;
+            font-size: clamp(32px, 7vw, 56px); color: #fff; line-height: 0.97; margin-bottom: 16px;
+        }
+        .section-title .pk { color: var(--egreen); }
+        .section-sub { font-size: 18px; color: var(--muted); margin-bottom: 40px; line-height: 1.65; }
+        .problem-list { list-style: none; display: grid; grid-template-columns: 1fr; gap: 16px; text-align: left; }
+        @media(min-width: 640px) { .problem-list { grid-template-columns: 1fr 1fr; } }
+        .problem-list li {
+            display: flex; align-items: flex-start; gap: 14px;
+            background: var(--dark2); border-left: 3px solid #FF3333;
+            border-radius: 10px; padding: 22px 20px;
+            font-size: 15px; color: #E5E7EB; line-height: 1.55;
+        }
+        .problem-list li .ico { font-size: 20px; flex-shrink: 0; margin-top: 1px; color: #FF3333;}
+
+        /* ══ SOLUÇÃO ══ */
+        .section-solution { background: #1A1A1A; padding: 72px 0; border-top: 1px solid #333; }
+        .sol-cards { display: grid; gap: 20px; grid-template-columns: 1fr; max-width: 1000px; margin: 0 auto;}
+        @media(min-width: 768px) { .sol-cards { grid-template-columns: repeat(3, 1fr); } }
+        .sol-card {
+            background: var(--dark); border-radius: 14px; padding: 32px 24px; 
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5); border: 1px solid #333;
+            transition: transform 0.3s, border-color 0.3s;
+        }
+        .sol-card:hover { transform: translateY(-5px); border-color: var(--egreen); }
+        .sol-card .sc-icon { font-size: 36px; margin-bottom: 16px; color: var(--egreen); }
+        .sol-card h3 {
+            font-family: 'Bebas Neue', 'Impact', sans-serif; font-size: 26px; font-weight: 700;
+            color: #FFF; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px;
+        }
+        .sol-card p { color: var(--muted); font-size: 15px; line-height: 1.65; }
+
+        /* ══ PROOF CAROUSEL ══ */
+        .section-proof { background: var(--dark2); border-top: 1px solid #222;}
+        .section-proof .section-title { text-align: center; margin-bottom: 8px; }
+        .section-proof .section-sub { text-align: center; margin-bottom: 40px;}
+        .proof-swiper { padding: 0 0 50px !important; }
+        .proof-swiper .swiper-slide { border-radius: 12px; overflow: hidden; box-shadow: 0 12px 40px rgba(0,0,0,0.55); border: 1px solid #333; background: #000; }
+        .proof-swiper .swiper-slide img { width: 100%; display: block; object-fit: contain;}
+        .swiper-pagination-bullet { background: var(--egreen) !important; opacity: 0.4; }
+        .swiper-pagination-bullet-active { opacity: 1 !important; box-shadow: 0 0 10px var(--egreen);}
+        .swiper-button-next, .swiper-button-prev { color: var(--egreen) !important; text-shadow: 0 2px 4px rgba(0,0,0,0.8);}
+
+        /* ══ CTA FINAL (ROLETA) ══ */
+        .section-cta {
+            background: radial-gradient(circle at center, #1E1E1E 0%, #121212 100%);
+            border-top: 2px solid rgba(0, 255, 0, 0.2);
+            padding: 80px 0; text-align: center; position: relative;
+        }
+        .cta-title {
+            font-family: 'Bebas Neue', 'Impact', sans-serif; font-weight: 700; text-transform: uppercase;
+            font-size: clamp(36px, 8vw, 64px); color: #fff; line-height: 0.95; margin-bottom: 16px;
+        }
+        .cta-sub { font-size: 18px; color: var(--muted); line-height: 1.65; margin-bottom: 32px; max-width: 580px; margin-left: auto; margin-right: auto; }
+        .vagas-pill {
+            display: inline-flex; align-items: center; gap: 10px;
+            background: #000; border: 1.5px solid rgba(0, 255, 0, 0.4);
+            border-radius: 100px; padding: 8px 20px; margin-bottom: 28px; box-shadow: 0 0 15px rgba(0,255,0,0.1);
+        }
+        .vagas-pill .vp-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--egreen); animation: blink 1.4s infinite; flex-shrink: 0; }
+        .vagas-pill span { font-size: 14px; color: #FFF; }
+        .vagas-pill strong { color: var(--egreen); }
+        .cta-note { margin-top: 20px; font-size: 13px; color: var(--muted); }
+
+        /* ══ NOTIFICAÇÕES ══ */
+        .notif-stack {
+            position: fixed; left: 14px; bottom: 14px; z-index: 9000;
+            display: flex; flex-direction: column; gap: 8px;
+            max-width: calc(100vw - 28px); width: 320px; pointer-events: none;
+        }
+        .notif {
+            background: var(--dark2); border-left: 4px solid var(--egreen);
+            color: #fff; padding: 12px 14px; border-radius: 8px;
+            box-shadow: 0 10px 28px rgba(0,0,0,0.8); font-size: 13px; line-height: 1.4;
+            display: flex; gap: 12px; align-items: center;
+            transform: translateX(-120%); opacity: 0;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease;
+            pointer-events: auto; border: 1px solid #333; border-left-width: 4px;
+        }
+        .notif.show { transform: translateX(0); opacity: 1; }
+        .notif .av {
+            width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+            background: var(--egreen);
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 800; color: #000; font-size: 14px;
+        }
+        .notif strong { color: var(--egreen); display: block; font-size: 14px; font-weight: 700;}
+        .notif .meta { font-size: 11px; color: var(--muted); margin-top: 2px; }
+        @media(max-width: 480px) { .notif-stack { width: auto; right: 14px; } }
+
+        /* ══ FOOTER ══ */
+        footer { background: #000; padding: 40px 0; text-align: center; border-top: 1px solid #222;}
+        footer .legal-links { margin-bottom: 20px; }
+        footer .legal-links a { color: var(--muted); font-size: 12px; margin: 0 10px; transition: color 0.2s;}
+        footer .legal-links a:hover { color: var(--egreen); text-decoration: underline;}
+        footer .disc { max-width: 800px; margin: 14px auto 0; font-size: 11px; color: #666; line-height: 1.6; }
+        .footer-badges { display: flex; justify-content: center; align-items: center; gap: 16px; margin-bottom: 20px;}
+        .badge-18 { border: 1px solid #FF3333; color: #FF3333; font-weight: 800; padding: 2px 8px; border-radius: 4px; font-size: 12px;}
+
+        /* ══ REVEAL ══ */
+        .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.7s ease-out, transform 0.7s ease-out; }
+        .reveal.visible { opacity: 1; transform: translateY(0); }
+        .rd-1 { transition-delay: 0.1s; } .rd-2 { transition-delay: 0.2s; } .rd-3 { transition-delay: 0.3s; }
+    .logo {
+    max-height: 150px;
+    width: auto;
+}
+    </style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar" id="topbar">
+    <div class="inner">
+        <span class="tb-label"><i class="fa-solid fa-bolt"></i> SORTEIO LIBERADO HOJE — GARANTA SUA CHANCE</span>
+        <div class="cd-pill">
+            <span class="cd-lbl">Expira em</span>
+            <span class="cd-time" id="tb-time">03:00</span>
+        </div>
+    </div>
+</div>
+
+<!-- HERO -->
+<header class="hero">
+    <div class="bg-grid-pattern"></div>
+    <div class="container">
+        <div class="hero-grid">
+            <div class="hero-text">
+                <div class="eyebrow reveal"><img class="logo" src="https://i.imgur.com/X4B7YGa.png" alt="eGreen" ></div>
+                <h1 class="reveal rd-1">
+                    PARE DE CHUTAR.<br>
+                    COMECE A LUCRAR COM A <span class="accent">IA QUE DECODIFICOU</span> O FUTEBOL.
+                </h1>
+                <p class="hero-sub reveal rd-2">
+                    Tenha a leitura dos pro-players em tempo real. Identifique as melhores oportunidades matemáticas antes das casas de apostas ajustarem as odds.
+                </p>
+                <div class="btn-wrap reveal rd-3" style="justify-content: flex-start;">
+                    <a href="roleta.html" class="btn-green btn-pulse lead" onclick="fbq('trackCustom', 'Click_PreRoleta');">
+                        🔥 GIRAR A ROLETA E GANHAR ACESSO →
+                    </a>
+                </div>
+                <p class="mt-4 text-xs text-gray-500 reveal rd-3 text-left">*Todos que girarem a roleta hoje ganham 1 Mês do Plano Starter Grátis.</p>
+            </div>
+            <div class="hero-photo-wrap reveal rd-2">
+                <!-- Mantivemos a coerência do VSL que você já usa na plataforma principal -->
+                <iframe 
+                    src="https://www.youtube-nocookie.com/embed/CXW9q4LrdiM?rel=0&modestbranding=1&autoplay=1&mute=1" 
+                    title="Apresentação eGreen" 
+                    frameborder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- STATS -->
+<div class="stats-bar reveal">
+    <div class="container">
+        <div class="stats-grid">
+            <div><div class="sn">100%</div><div class="sl">Baseado em Dados</div></div>
+            <div><div class="sn">24/7</div><div class="sl">Monitoramento Real-Time</div></div>
+            <div><div class="sn">0 R$</div><div class="sl">Custo para Iniciar Hoje</div></div>
+        </div>
+    </div>
+</div>
+
+<!-- PROBLEMA -->
+<section class="section-problem">
+    <div class="container">
+        <div class="problem-wrap">
+            <h2 class="section-title reveal">
+                Por que tentar estudar sozinho<br>
+                <span class="pk">se você pode plugar uma IA?</span>
+            </h2>
+            <p class="section-sub reveal rd-1">Você tem trabalho, estudo e rotina. A maioria perde a banca porque cai nesses erros básicos:</p>
+            <ul class="problem-list">
+                <li class="reveal rd-1">
+                    <span class="ico"><i class="fa-solid fa-xmark"></i></span>
+                    <span><strong>Aposta no "achismo":</strong> Entra em jogos sem histórico, confiando apenas no nome do jogador e zera a banca no fim do mês.</span>
+                </li>
+                <li class="reveal rd-2">
+                    <span class="ico"><i class="fa-solid fa-xmark"></i></span>
+                    <span><strong>Timing Errado:</strong> Perde horas analisando e quando decide entrar, a odd derreteu e o valor da aposta sumiu.</span>
+                </li>
+                <li class="reveal rd-3">
+                    <span class="ico"><i class="fa-solid fa-xmark"></i></span>
+                    <span><strong>Sinais Atrasados:</strong> Depende de grupos de Telegram VIP onde o tipster manda a entrada 2 minutos atrasada.</span>
+                </li>
+                <li class="reveal rd-4">
+                    <span class="ico"><i class="fa-solid fa-xmark"></i></span>
+                    <span><strong>Falta de Controle:</strong> Tenta recuperar o Red (loss) fazendo apostas duplas sem nenhum embasamento matemático.</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<!-- SOLUÇÃO -->
+<section class="section-solution">
+    <div class="container">
+        <div class="text-center mb-12">
+            <h2 class="section-title reveal" style="color: #FFF;">Como a <span class="pk">eGreen.ai</span> muda o jogo</h2>
+            <p class="section-sub reveal rd-1" style="max-width: 600px; margin: 0 auto;">Nós transformamos as apostas esportivas em pura matemática. Nossa IA varre milhares de partidas diárias para entregar a probabilidade exata na sua tela.</p>
+        </div>
+        <div class="sol-cards">
+            <div class="sol-card reveal rd-1">
+                <div class="sc-icon"><i class="fa-solid fa-microchip"></i></div>
+                <h3>Análise Preditiva</h3>
+                <p>O algoritmo cruza o histórico dos pro-players, estilo de jogo e desempenho nos últimos 5 minutos para prever o próximo gol.</p>
+            </div>
+            <div class="sol-card reveal rd-2">
+                <div class="sc-icon"><i class="fa-solid fa-filter"></i></div>
+                <h3>Filtros Profissionais</h3>
+                <p>Não quer analisar tudo? Configure a eGreen para te avisar apenas quando um jogo tiver mais de 85% de chance de Over 2.5.</p>
+            </div>
+            <div class="sol-card reveal rd-3">
+                <div class="sc-icon"><i class="fa-solid fa-bolt"></i></div>
+                <h3>Prompt Aberto</h3>
+                <p>Você no controle. Pergunte para a IA: "Qual a chance do Player A virar o jogo?" e receba a probabilidade estatística instantânea.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- PROOF CAROUSEL -->
+<section class="section-proof">
+    <div class="container">
+        <h2 class="section-title reveal">O que nossos usuários veem por dentro</h2>
+        <p class="section-sub reveal rd-1">Plataforma intuitiva. Sem planilhas complexas, apenas os dados que importam para você lucrar.</p>
+        
+        <div class="swiper proof-swiper reveal rd-2">
+            <div class="swiper-wrapper">
+                <div class="swiper-slide"><img src="https://i.imgur.com/pI9XMxJ.png" alt="Dashboard eGreen" loading="lazy" /></div>
+                <div class="swiper-slide"><img src="https://i.imgur.com/EehdQpw.png" alt="Estatísticas eGreen" loading="lazy" /></div>
+                <div class="swiper-slide"><img src="https://i.imgur.com/0N0bEAG.png" alt="Análise eGreen" loading="lazy" /></div>
+                <div class="swiper-slide"><img src="https://i.imgur.com/Q6kyF8V.png" alt="Mercados eGreen" loading="lazy" /></div>
+            </div>
+            <div class="swiper-pagination"></div>
+            <div class="swiper-button-prev"></div>
+            <div class="swiper-button-next"></div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA FINAL -->
+<section class="section-cta">
+    <div class="container">
+        <h2 class="cta-title reveal">
+            ÚLTIMA CHANCE —<br>
+            <span class="pk">RODE A ROLETA E PEGUE SEU ACESSO</span>
+        </h2>
+        <p class="cta-sub reveal rd-1">
+            Nós liberamos um sorteio exclusivo hoje. Você gira a roleta e ganha prêmios reais na plataforma, incluindo <strong class="text-white">1 Mês do Plano Starter 100% Grátis</strong>.
+        </p>
+        <div style="display:flex; justify-content:center" class="reveal rd-2">
+            <div class="vagas-pill">
+                <span class="vp-dot"></span>
+                <span>Sorteio garantido. <strong>Todo mundo ganha hoje.</strong></span>
+            </div>
+        </div>
+        <div class="btn-wrap reveal rd-3">
+            <a href="roleta.html" class="btn-green btn-pulse lead" onclick="fbq('trackCustom', 'Click_PreRoleta_Bottom');">
+                🔥 QUERO GIRAR A ROLETA AGORA →
+            </a>
+        </div>
+        <p class="cta-note reveal rd-4"><i class="fa-solid fa-lock"></i> Seu prêmio é ativado na hora, de forma 100% segura.</p>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+    <div class="container">
+        <div class="footer-badges">
+            <img src="https://i.imgur.com/X4B7YGa.png" alt="eGreen Logo" class="max-h-[35px] object-contain grayscale opacity-70">
+            <span class="badge-18">18+</span>
+        </div>
+        <div class="legal-links">
+            <a href="#">Termos de Uso</a>
+            <a href="#">Política de Privacidade</a>
+            <a href="#">Contato</a>
+        </div>
+        <div>© <span id="yr"></span> eGreen.ai — Todos os direitos reservados.</div>
+        <p class="disc">
+            O egreen.ai é uma ferramenta de análise estatística. Resultados passados não garantem lucros futuros. Apostas esportivas envolvem alto risco financeiro e podem causar dependência. Jogue com moderação e responsabilidade. Ao prosseguir, você concorda com nossos termos.
+        </p>
+    </div>
+</footer>
+
+<!-- NOTIFICAÇÕES FAKES -->
+<div class="notif-stack" id="notifStack"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script>
+    // Configurar Ano Footer
+    document.getElementById('yr').textContent = new Date().getFullYear();
+
+    // Contagem Regressiva (3 minutos)
+    (function(){
+        let duration = 3 * 60;
+        const el = document.getElementById('tb-time');
+        function pad(n) { return String(n).padStart(2, '0'); }
+        const interval = setInterval(() => {
+            if(duration <= 0) { duration = 3 * 60; } // Reinicia loop
+            let mm = Math.floor(duration / 60);
+            let ss = duration % 60;
+            el.textContent = pad(mm) + ':' + pad(ss);
+            duration--;
+        }, 1000);
+    })();
+
+    // Swiper Carousel
+    document.addEventListener('DOMContentLoaded', function() {
+        new Swiper('.proof-swiper', {
+            slidesPerView: 1.1, spaceBetween: 16, centeredSlides: true, loop: true,
+            autoplay: { delay: 4000, disableOnInteraction: false },
+            pagination: { el: '.proof-swiper .swiper-pagination', clickable: true },
+            navigation: { nextEl: '.proof-swiper .swiper-button-next', prevEl: '.proof-swiper .swiper-button-prev' },
+            breakpoints: { 640: { slidesPerView: 1.5 }, 1024: { slidesPerView: 2.5 } }
+        });
+    });
+
+    // Animações de Scroll (Reveal)
+    (function(){
+        const obs = new IntersectionObserver((entries) => {
+            entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+    })();
+
+    // Notificações Falsas Inteligentes
+    (function(){
+        const stack = document.getElementById('notifStack');
+        const names = ['Carlos M.', 'Lucas Silva', 'Rafael T.', 'Matheus J.', 'Bruno F.', 'Thiago C.', 'André Luiz'];
+        const prizes = ['acabou de girar a roleta', 'ganhou 1 Mês Grátis (Starter)', 'já está analisando com a IA'];
+        const times = ['agora mesmo', 'há 10 segundos', 'há 30 segundos'];
+        const MAX = 3;
+
+        function rand(a) { return a[Math.floor(Math.random() * a.length)]; }
+        
+        function show() {
+            const n = rand(names), p = rand(prizes), t = rand(times);
+            const el = document.createElement('div');
+            el.className = 'notif';
+            el.innerHTML = `
+                <div class="av"><i class="fa-solid fa-gift"></i></div>
+                <div><strong>${n}</strong>${p}<div class="meta">${t}</div></div>
+            `;
+            stack.appendChild(el);
+            
+            while(stack.children.length > MAX) stack.firstElementChild.remove();
+            
+            requestAnimationFrame(() => el.classList.add('show'));
+            
+            setTimeout(() => {
+                el.classList.remove('show');
+                setTimeout(() => el.remove(), 400);
+            }, 4500);
+
+            // Tempo randômico entre 5 e 12 segundos para a próxima notificação
+            setTimeout(show, Math.floor(Math.random() * (12000 - 5000 + 1)) + 5000);
+        }
+        setTimeout(show, 2000); // Inicia primeira notificação após 2s
+    })();
+</script>
+
+</body>
+</html>

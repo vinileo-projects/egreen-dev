@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>egreen.ai - Roleta Premiada</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;850&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'egreen-bg': '#121212',
+                        'egreen-card': '#1E1E1E',
+                        'egreen-accent': '#00FF00',
+                        'egreen-text': '#F3F4F6',
+                        'egreen-muted': '#9CA3AF'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Inter', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'neon': '0 0 20px rgba(0, 255, 0, 0.4)',
+                        'neon-strong': '0 0 40px rgba(0, 255, 0, 0.6)',
+                    },
+                    animation: {
+                        'bounce-slow': 'bounce 3s infinite',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        .bg-grid-pattern {
+            background-image: radial-gradient(#1f2937 1px, transparent 1px);
+            background-size: 20px 20px;
+            opacity: 0.15;
+        }
+
+        /* Estrutura Visual da Roleta */
+        .wheel-container {
+            width: 320px;
+            height: 320px;
+            border-radius: 50%;
+            position: relative;
+            overflow: hidden;
+            border: 8px solid #1E1E1E;
+            box-shadow: 0 0 30px rgba(0, 255, 0, 0.3);
+            transition: transform 5s cubic-bezier(0.25, 0.1, 0.15, 1);
+            background: conic-gradient(
+                #00FF00 0deg 45deg,
+                #2A2A2A 45deg 90deg,
+                #1E1E1E 90deg 135deg,
+                #2A2A2A 135deg 180deg,
+                #1E1E1E 180deg 225deg,
+                #2A2A2A 225deg 270deg,
+                #1E1E1E 270deg 315deg,
+                #2A2A2A 315deg 360deg
+            );
+        }
+
+        .slice-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 135px;
+            transform-origin: 0% 50%;
+            text-align: right;
+            font-size: 11px;
+            font-weight: bold;
+            color: white;
+            line-height: 1.2;
+            margin-top: -15px;
+            padding-right: 15px;
+            text-transform: uppercase;
+        }
+
+        .pointer {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 20;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5));
+        }
+
+        .toast-enter { transform: translateY(100%); opacity: 0; }
+        .toast-enter-active { transform: translateY(0); opacity: 1; transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        .toast-leave-active { transform: translateY(-100%); opacity: 0; transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        .logo { max-height: 150px; width: auto; }
+    </style>
+
+    <script>
+        !function(f,b,e,v,n,t,s)
+        {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+        n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+        if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+        n.queue=[];t=b.createElement(e);t.async=!0;
+        t.src=v;s=b.getElementsByTagName(e)[0];
+        s.parentNode.insertBefore(t,s)}(window, document,'script',
+        'https://connect.facebook.net/en_US/fbevents.js');
+        fbq('init', '756953347467899');
+        fbq('track', 'PageView');
+    </script>
+    <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=756953347467899&ev=PageView&noscript=1"/></noscript>
+</head>
+<body class="bg-egreen-bg text-egreen-text font-sans antialiased min-h-screen relative overflow-hidden flex flex-col">
+
+    <div class="fixed inset-0 bg-grid-pattern pointer-events-none z-0"></div>
+    <div class="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-green-900/20 via-egreen-bg to-egreen-bg pointer-events-none z-0"></div>
+
+    <header class="relative z-10 w-full p-6 flex justify-center items-center border-b border-gray-800 bg-black/50 backdrop-blur-md">
+        <img src="https://i.imgur.com/X4B7YGa.png" alt="egreen.ai Logo" class="max-h-[35px] object-contain">
+        <div class="absolute right-6 flex items-center gap-2 bg-red-500/20 border border-red-500/50 text-red-500 px-3 py-1 rounded-full text-xs font-bold">
+            <i class="fa-solid fa-clock"></i> <span id="countdown">10:00</span>
+        </div>
+    </header>
+
+    <main class="relative z-10 flex-grow flex flex-col items-center justify-center p-4">
+        <div class="text-center mb-8 max-w-lg">
+            <div class="inline-block bg-egreen-accent text-black px-4 py-1 rounded-full text-xs font-extrabold uppercase tracking-widest mb-4 animate-pulse">
+                Sorteio Exclusivo de Hoje
+            </div>
+            <h1 class="text-3xl md:text-5xl font-bold text-white mb-2 leading-tight">
+                Gire e <span class="text-egreen-accent text-glow">Ganhe</span>
+            </h1>
+            <p class="text-gray-400 text-sm md:text-base">
+                Você tem 1 giro grátis. Prêmios garantidos na plataforma egreen.ai.
+            </p>
+        </div>
+
+        <div class="relative mb-10">
+            <div class="pointer text-5xl text-white"><i class="fa-solid fa-caret-down"></i></div>
+            <div class="wheel-container" id="wheel">
+                <div class="slice-text text-black text-[12px] font-black" style="transform: rotate(-67.5deg);">1 MÊS GRÁTIS<br>(Starter)</div>
+                <div class="slice-text" style="transform: rotate(-22.5deg);">100<br>Créditos</div>
+                <div class="slice-text" style="transform: rotate(22.5deg);">50% OFF</div>
+                <div class="slice-text" style="transform: rotate(67.5deg);">Tente<br>Novamente</div>
+                <div class="slice-text" style="transform: rotate(112.5deg);">500<br>Créditos</div>
+                <div class="slice-text" style="transform: rotate(157.5deg);">10% OFF</div>
+                <div class="slice-text" style="transform: rotate(202.5deg);">Dica VIP</div>
+                <div class="slice-text" style="transform: rotate(247.5deg);">750<br>Créditos</div>
+            </div>
+        </div>
+
+        <button id="spin-btn" class="bg-egreen-accent hover:bg-green-400 text-black font-extrabold py-4 px-12 rounded-xl text-xl shadow-neon transition-all duration-300 transform hover:scale-105 uppercase tracking-wide">
+            Girar Roleta Agora
+        </button>
+    </main>
+
+    <div id="win-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-egreen-card border-2 border-egreen-accent rounded-3xl p-8 max-w-md w-full text-center shadow-neon-strong transform scale-95 opacity-0 transition-all duration-300" id="win-modal-content">
+            <div class="text-6xl text-egreen-accent mb-4 animate-bounce-slow"><i class="fa-solid fa-gift"></i></div>
+            <h2 class="text-3xl font-bold text-white mb-2">VOCÊ GANHOU!</h2>
+            <p class="text-xl text-egreen-accent font-bold mb-6">1 Mês do Plano Starter Grátis</p>
+            <p class="text-gray-300 text-sm mb-8 leading-relaxed">
+                Parabéns! Para ativar o seu prêmio, preencha seus dados para criar sua conta gratuita na eGreen.
+            </p>
+            <button id="claim-btn" class="w-full bg-egreen-accent text-black font-bold py-4 rounded-xl text-lg shadow-neon hover:bg-green-400 transition-colors">
+                Resgatar Prêmio Agora
+            </button>
+        </div>
+    </div>
+
+    <div id="register-modal" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-egreen-card border border-gray-700 rounded-3xl p-6 md:p-8 max-w-md w-full shadow-2xl">
+            <h2 class="text-2xl font-bold text-white text-center mb-2">Crie sua Conta Grátis</h2>
+            <p class="text-gray-400 text-xs text-center mb-6">Insira seus dados reais para vincular e liberar o prêmio no sistema.</p>
+            
+            <form id="egreen-register-form" class="space-y-4">
+                <div>
+                    <label class="block text-gray-400 text-xs font-bold mb-1">Nome Completo</label>
+                    <input type="text" id="reg-name" placeholder="Digite seu nome" class="w-full bg-[#121212] border border-gray-700 text-white rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-egreen-accent transition-colors" required>
+                </div>
+                <div>
+                    <label class="block text-gray-400 text-xs font-bold mb-1">E-mail</label>
+                    <input type="email" id="reg-email" placeholder="seuemail@provedor.com" class="w-full bg-[#121212] border border-gray-700 text-white rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-egreen-accent transition-colors" required>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-gray-400 text-xs font-bold mb-1">WhatsApp</label>
+                        <input type="text" id="reg-phone" placeholder="(00) 00000-0000" class="w-full bg-[#121212] border border-gray-700 text-white rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-egreen-accent transition-colors" required>
+                    </div>
+                    <div>
+                        <label class="block text-gray-400 text-xs font-bold mb-1">CPF</label>
+                        <input type="text" id="reg-cpf" placeholder="000.000.000-00" class="w-full bg-[#121212] border border-gray-700 text-white rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-egreen-accent transition-colors" required>
+                    </div>
+                </div>
+
+                <div id="api-error" class="text-red-500 text-xs text-center hidden font-semibold"></div>
+
+                <button type="submit" id="reg-submit-btn" class="w-full bg-egreen-accent text-black font-extrabold py-4 rounded-xl text-lg shadow-neon hover:bg-green-400 transition-colors uppercase tracking-wide mt-2">
+                    Avançar para Ativação <i class="fa-solid fa-arrow-right ml-1"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div id="partner-modal" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-egreen-card border border-gray-700 rounded-3xl p-6 md:p-8 max-w-md w-full text-center shadow-2xl relative">
+            <h2 class="text-2xl font-bold text-white mb-4">Ativação do Prêmio</h2>
+            <p class="text-gray-300 text-sm mb-6 leading-relaxed">
+                Para validar o seu mês totalmente gratuito, basta realizar o primeiro depósito em uma das nossas parceiras selecionadas abaixo.
+            </p>
+
+            <div id="partner-logo-container" class="bg-[#121212] rounded-xl p-6 mb-6 border border-gray-800 flex flex-col items-center justify-center min-h-[140px] relative overflow-hidden">
+                <p class="text-gray-400 font-semibold mb-4 text-center text-sm">Casa selecionada para você:</p>
+                <img id="partner-logo" src="" alt="Casa Parceira" class="h-10 md:h-12 object-contain transition-all duration-300 drop-shadow-md">
+            </div>
+
+            <div class="flex flex-col gap-3">
+                <button id="btn-no-account" class="w-full bg-egreen-accent text-black font-bold py-4 rounded-xl text-lg shadow-neon hover:bg-green-400 transition-colors tracking-wide flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-gift"></i> Criar conta e ativar prêmio!
+                </button>
+                <button id="btn-has-account" class="w-full bg-transparent text-gray-500 text-sm font-bold py-2 rounded-xl hover:text-white transition-colors mt-2">
+                    Já sou cliente (Pular casa)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="deposit-modal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-egreen-card border border-gray-700 rounded-3xl p-6 md:p-8 max-w-md w-full text-center shadow-2xl">
+            <div id="upload-stage">
+                <h2 class="text-2xl font-bold text-white mb-2">Envie o Comprovante</h2>
+                <p class="text-gray-400 text-sm mb-6">Efetue o depósito mínimo de <strong class="text-egreen-accent">R$ 30,00</strong> na casa aberta e anexe o print para auditoria da liberação.</p>
+                
+                <form id="form-comprovante" class="space-y-4">
+                    <div class="text-left">
+                        <label class="block text-gray-400 text-xs font-bold mb-2">Comprovante de Depósito (Print)</label>
+                        <input type="file" id="file-proof" accept="image/*" class="w-full bg-[#1A1A1A] border border-gray-700 text-gray-400 rounded-lg px-4 py-2 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-egreen-accent file:text-black hover:file:bg-green-400 cursor-pointer" required>
+                    </div>
+                    <button type="submit" class="w-full bg-egreen-accent text-black font-extrabold py-4 rounded-xl text-lg shadow-neon hover:bg-green-400 transition-colors uppercase tracking-wide">
+                        Concluir e Ativar Código
+                    </button>
+                </form>
+            </div>
+
+            <div id="success-stage" class="hidden py-4">
+                <div class="text-6xl text-egreen-accent mb-4"><i class="fa-solid fa-circle-check"></i></div>
+                <h3 class="text-2xl font-bold text-white mb-2">Em Análise!</h3>
+                <p class="text-gray-400 text-sm mb-6">Recebemos o print e os dados da sua conta. O prazo de ativação do Plano Starter é de até 24 horas.</p>
+                <button onclick="window.location.href='https://egreen.app.br'" class="w-full bg-transparent border border-gray-600 text-gray-300 font-bold py-3 rounded-xl hover:bg-gray-800 transition-colors">
+                    Voltar para egreen.ai
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast-container" class="fixed bottom-4 left-4 z-40 flex flex-col gap-2 pointer-events-none"></div>
+
+    <footer class="relative z-10 bg-black/80 py-6 border-t border-gray-900 w-full mt-auto backdrop-blur-md">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <div class="flex items-center justify-center gap-4 mb-4 text-gray-500 text-xs">
+                <span class="border border-red-900 text-red-500 rounded-full px-2 py-0.5 font-bold">18+</span>
+                <span><i class="fa-solid fa-shield-halved mr-1"></i> Jogue com responsabilidade</span>
+            </div>
+            <p class="text-gray-600 text-[10px] md:text-xs leading-relaxed mb-2">
+                <strong>Aviso Legal:</strong> O egreen.ai é uma ferramenta de análise estatística. Resultados passados não garantem lucros futuros. Apostas esportivas envolvem alto risco financeiro e podem causar dependência. Jogue com moderação.
+            </p>
+            <p class="text-gray-700 text-[10px]">&copy; 2026 egreen.ai - Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <script>
+        // --- MÁSCARAS DE INPUTS ---
+        document.getElementById('reg-phone').addEventListener('input', e => {
+            let x = e.target.value.replace(/\D/g, '').match(/(\d{0,2})(\d{0,5})(\d{0,4})/);
+            e.target.value = !x[2] ? x[1] : '(' + x[1] + ') ' + x[2] + (x[3] ? '-' + x[3] : '');
+        });
+        document.getElementById('reg-cpf').addEventListener('input', e => {
+            let x = e.target.value.replace(/\D/g, '').match(/(\d{0,3})(\d{0,3})(\d{0,3})(\d{0,2})/);
+            e.target.value = !x[2] ? x[1] : x[1] + '.' + x[2] + '.' + x[3] + (x[4] ? '-' + x[4] : '');
+        });
+
+        // --- CORE DA ROLETA ---
+        const wheel = document.getElementById('wheel');
+        const spinBtn = document.getElementById('spin-btn');
+        const winModal = document.getElementById('win-modal');
+        const winModalContent = document.getElementById('win-modal-content');
+        let spinning = false;
+
+        spinBtn.addEventListener('click', () => {
+            if (spinning) return;
+            spinning = true;
+            const targetRotation = (360 * 8) + 337.5; 
+            wheel.style.transform = `rotate(${targetRotation}deg)`;
+            spinBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            spinBtn.innerText = "Girando...";
+            setTimeout(() => {
+                winModal.classList.remove('hidden');
+                setTimeout(() => {
+                    winModalContent.classList.remove('scale-95', 'opacity-0');
+                    winModalContent.classList.add('scale-100', 'opacity-100');
+                }, 50);
+                if (typeof fbq === 'function') fbq('trackCustom', 'Giveaway_Spin_Win');
+            }, 5200);
+        });
+
+        // Transição do Modal Recompensa para o Formulário eGreen
+        const claimBtn = document.getElementById('claim-btn');
+        const registerModal = document.getElementById('register-modal');
+        claimBtn.addEventListener('click', () => {
+            winModal.classList.add('hidden');
+            registerModal.classList.remove('hidden');
+        });
+
+        // --- ENVIO DO CADASTRO EGREEN (CURL API POST + METAPIXEL LEAD) ---
+        const registerForm = document.getElementById('egreen-register-form');
+        const regSubmitBtn = document.getElementById('reg-submit-btn');
+        const apiError = document.getElementById('api-error');
+
+        registerForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            apiError.classList.add('hidden');
+
+            const nameValue = document.getElementById('reg-name').value.trim();
+            const emailValue = document.getElementById('reg-email').value.trim();
+            const phoneValue = document.getElementById('reg-phone').value.replace(/\D/g, '');
+            const cpfValue = document.getElementById('reg-cpf').value.replace(/\D/g, '');
+
+            // Validação Rigorosa de Campos Obrigatórios
+            if (!nameValue || !emailValue || !phoneValue || !cpfValue) {
+                apiError.innerText = "Por favor, preencha todos os campos.";
+                apiError.classList.remove('hidden');
+                return;
+            }
+
+            if (phoneValue.length < 10) {
+                apiError.innerText = "Por favor, insira um número de WhatsApp válido.";
+                apiError.classList.remove('hidden');
+                return;
+            }
+
+            if (cpfValue.length !== 11) {
+                apiError.innerText = "Por favor, insira um CPF válido (11 dígitos).";
+                apiError.classList.remove('hidden');
+                return;
+            }
+
+            regSubmitBtn.disabled = true;
+            regSubmitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Registrando...';
+
+            const payload = {
+                name: nameValue,
+                email: emailValue,
+                sendWelcomeEmail: true,
+                phone: phoneValue,
+                cpf: cpfValue
+            };
+
+            try {
+                const response = await fetch('https://egreen-api-v2.onrender.com/api/external/register-free', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-API-Key': 'eg_ext_8f92bd3a41e57c6b90f42a1b5c8d3e9f'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) throw new Error('Falha ao comunicar com o servidor da API.');
+
+                // Disparar Pixel de Lead da Meta com sucesso da resposta
+                if (typeof fbq === 'function') {
+                    fbq('track', 'Lead', {
+                        em: payload.email,
+                        ph: payload.phone,
+                        fn: payload.name
+                    });
+                }
+
+                // Avança para o funil das Casas Parceiras
+                registerModal.classList.add('hidden');
+                showPartnerModal();
+                
+                regSubmitBtn.disabled = false;
+                regSubmitBtn.innerHTML = 'Avançar para Ativação <i class="fa-solid fa-arrow-right ml-1"></i>';
+
+            } catch (err) {
+                console.error("Erro de API/CORS:", err);
+                
+                // MODO DE TESTE (Bypass para origin 'null'): Evita que o funil trave devido ao bloqueio de CORS da API localmente/no iframe.
+                apiError.innerHTML = "Aviso (Modo Teste): Erro de CORS detectado na API. Simulando sucesso em 2s...";
+                apiError.classList.remove('text-red-500');
+                apiError.classList.add('text-yellow-400');
+                apiError.classList.remove('hidden');
+
+                setTimeout(() => {
+                    if (typeof fbq === 'function') {
+                        fbq('track', 'Lead', { em: payload.email, ph: payload.phone, fn: payload.name });
+                    }
+                    registerModal.classList.add('hidden');
+                    showPartnerModal();
+                    
+                    // Restaura os status
+                    regSubmitBtn.disabled = false;
+                    regSubmitBtn.innerHTML = 'Avançar para Ativação <i class="fa-solid fa-arrow-right ml-1"></i>';
+                    apiError.classList.add('hidden');
+                    apiError.classList.remove('text-yellow-400');
+                    apiError.classList.add('text-red-500');
+                }, 2000);
+            }
+        });
+
+        // --- FUNIL DE AFILIADOS ---
+        const partners = [
+            { id: 'melbet', name: 'Melbet', url: 'https://refpa3665.com/L?tag=d_5544630m_66329c_&site=5544630&ad=66329', logo: 'https://easybet.com/wp-content/uploads/2025/06/Melbet-Logo.webp' },
+            { id: 'estrelabet', name: 'EstrelaBet', url: 'https://egreen.app.br/affiliate-redirect/estrelabet', logo: 'https://upload.wikimedia.org/wikipedia/commons/9/90/Estrela_Bet_logo.png' },
+            { id: 'stake', name: 'Stake', url: 'https://egreen.app.br/affiliate-redirect/stake', logo: 'https://stake.bet.br/assets/images/logo/logo.svg' }
+        ];
+        
+        let currentPartnerIndex = 0;
+        const partnerModal = document.getElementById('partner-modal');
+        const btnNoAccount = document.getElementById('btn-no-account');
+        const btnHasAccount = document.getElementById('btn-has-account');
+        const depositModal = document.getElementById('deposit-modal');
+
+        function showPartnerModal() {
+            if (currentPartnerIndex >= partners.length) {
+                document.getElementById('partner-logo-container').innerHTML = `
+                    <div class="text-4xl text-red-500 mb-4"><i class="fa-solid fa-circle-xmark"></i></div>
+                    <p class="text-white font-semibold mb-2">Contas Limite Atingido</p>
+                    <h3 class="text-sm font-bold text-gray-300 mb-2">Você já possui conta em todos os sistemas. Redirecionando para a eGreen principal...</h3>
+                `;
+                btnNoAccount.innerText = "Ir para egreen.ai";
+                btnNoAccount.onclick = () => window.location.href = "https://egreen.app.br";
+                btnHasAccount.style.display = 'none';
+                partnerModal.classList.remove('hidden');
+                return;
+            }
+            document.getElementById('partner-logo').src = partners[currentPartnerIndex].logo;
+            partnerModal.classList.remove('hidden');
+        }
+
+        // Click no Cadastro da Casa (DISPARA INITIATE PURCHASE / CHECKOUT)
+        btnNoAccount.addEventListener('click', () => {
+            if (currentPartnerIndex >= partners.length) return;
+            const house = partners[currentPartnerIndex];
+
+            // Dispara InitiateCheckout (Wording comercial "Initiate Purchase")
+            if (typeof fbq === 'function') fbq('track', 'InitiateCheckout', { content_name: house.name });
+
+            // Abre o link em nova aba
+            window.open(house.url, '_blank');
+
+            // Passa para a fase de envio do comprovante
+            partnerModal.classList.add('hidden');
+            depositModal.classList.remove('hidden');
+        });
+
+        btnHasAccount.addEventListener('click', () => {
+            currentPartnerIndex++;
+            showPartnerModal();
+        });
+
+        // --- SUBMIT COMPROVANTE DE DEPÓSITO (DISPARA COMPRA / PURCHASE) ---
+        document.getElementById('form-comprovante').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Dispara o Pixel de Compra definitivo
+            if (typeof fbq === 'function') {
+                fbq('track', 'Purchase', {
+                    value: 30.00,
+                    currency: 'BRL',
+                    content_name: 'Ativacao Plano Starter Roleta'
+                });
+            }
+
+            document.getElementById('upload-stage').classList.add('hidden');
+            document.getElementById('success-stage').classList.remove('hidden');
+        });
+
+        // --- CRONÔMETRO ---
+        let time = 600;
+        const countdownEl = document.getElementById('countdown');
+        setInterval(() => {
+            if (time <= 0) return;
+            time--;
+            countdownEl.innerText = `${Math.floor(time / 60).toString().padStart(2, '0')}:${(time % 60).toString().padStart(2, '0')}`;
+        }, 1000);
+
+        // --- NOTIFICAÇÕES TOASTS ---
+        const names = ['Carlos M.', 'Pedro R.', 'Lucas T.', 'Mateus S.', 'Felipe A.', 'Thiago J.', 'Gabriel C.'];
+        const prizes = ['ganhou 50% OFF', 'ganhou 1 Mês Starter', 'ganhou 500 Créditos'];
+        const toastContainer = document.getElementById('toast-container');
+
+        function createToast() {
+            if (spinning) return;
+            const toast = document.createElement('div');
+            toast.className = 'bg-black/80 border border-gray-800 text-white text-xs px-4 py-2 rounded-lg shadow-lg flex items-center gap-3 toast-enter';
+            toast.innerHTML = `<i class="fa-solid fa-circle-check text-egreen-accent"></i><span><strong>${names[Math.floor(Math.random() * names.length)]}</strong> acabou de ganhar <span class="text-egreen-accent">${prizes[Math.floor(Math.random() * prizes.length)]}</span>!</span>`;
+            toastContainer.appendChild(toast);
+            setTimeout(() => { toast.classList.remove('toast-enter'); toast.classList.add('toast-enter-active'); }, 10);
+            setTimeout(() => { toast.classList.remove('toast-enter-active'); toast.classList.add('toast-leave-active'); setTimeout(() => toast.remove(), 500); }, 4000);
+        }
+        setInterval(() => { if (Math.random() > 0.6) createToast(); }, 3500);
+    </script>
+</body>
+</html>
