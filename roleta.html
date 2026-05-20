@@ -278,19 +278,20 @@
 
     <script>
         // ----------------------------------------------------
-        // CONFIGURAÇÕES SUPABASE
-        // Substitua as strings abaixo pelas suas chaves reais
-        // Crie no Supabase: 
-        // 1. Um Bucket em Storage chamado 'comprovantes' (torne-o public)
-        // 2. Uma Tabela em Database chamada 'depositos_roleta' com as colunas: id, email, casa_parceira, comprovante_url
-        // ----------------------------------------------------
-        const SUPABASE_URL = 'https://kixcomicxwlgcxcqdfna.supabase.co'; 
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtpeGNvbWljeHdsZ2N4Y3FkZm5hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyMjU5NTUsImV4cCI6MjA5NDgwMTk1NX0.dyMj-YLDunD8OWw52P_a-ftoUADKWvHiAp1QgdPzGQs';
-        
-        let supabaseClient = null;
-        if(SUPABASE_URL !== 'https://kixcomicxwlgcxcqdfna.supabase.co') {
-            supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        }
+        // ... existing code ...
+
+// --- CONFIGURAÇÃO SUPABASE ---
+const SUPABASE_URL = 'https://kixcomicxwlgcxcqdfna.supabase.co'; 
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtpeGNvbWljeHdsZ2N4Y3FkZm5hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyMjU5NTUsImV4cCI6MjA5NDgwMTk1NX0.dyMj-YLDunD8OWw52P_a-ftoUADKWvHiAp1QgdPzGQs';
+
+let supabaseClient = null;
+
+// Verifica se a URL e a KEY não estão vazias ou como o placeholder padrão
+if(SUPABASE_URL && SUPABASE_URL !== 'COLOQUE_SUA_URL_AQUI' && SUPABASE_ANON_KEY) {
+    supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+} else {
+    console.warn("Supabase não configurado corretamente.");
+}
 
         // Variável global para guardar o e-mail no primeiro passo
         let registeredEmail = "";
