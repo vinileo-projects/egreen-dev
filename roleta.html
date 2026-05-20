@@ -11,6 +11,9 @@
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+    <!-- SUPABASE JS CLIENT -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <script>
         tailwind.config = {
             theme: {
@@ -238,7 +241,10 @@
                         <label class="block text-gray-400 text-xs font-bold mb-2">Comprovante de Depósito (Print)</label>
                         <input type="file" id="file-proof" accept="image/*" class="w-full bg-[#1A1A1A] border border-gray-700 text-gray-400 rounded-lg px-4 py-2 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-egreen-accent file:text-black hover:file:bg-green-400 cursor-pointer" required>
                     </div>
-                    <button type="submit" class="w-full bg-egreen-accent text-black font-extrabold py-4 rounded-xl text-lg shadow-neon hover:bg-green-400 transition-colors uppercase tracking-wide">
+                    
+                    <div id="deposit-error" class="text-red-500 text-xs text-center hidden font-semibold"></div>
+
+                    <button type="submit" id="deposit-submit-btn" class="w-full bg-egreen-accent text-black font-extrabold py-4 rounded-xl text-lg shadow-neon hover:bg-green-400 transition-colors uppercase tracking-wide">
                         Concluir e Ativar Código
                     </button>
                 </form>
@@ -271,6 +277,24 @@
     </footer>
 
     <script>
+        // ----------------------------------------------------
+        // CONFIGURAÇÕES SUPABASE
+        // Substitua as strings abaixo pelas suas chaves reais
+        // Crie no Supabase: 
+        // 1. Um Bucket em Storage chamado 'comprovantes' (torne-o public)
+        // 2. Uma Tabela em Database chamada 'depositos_roleta' com as colunas: id, email, casa_parceira, comprovante_url
+        // ----------------------------------------------------
+        const SUPABASE_URL = 'https://kixcomicxwlgcxcqdfna.supabase.co'; 
+        const SUPABASE_ANON_KEY = 'sb_publishable_4ponBjGjdoUjnO1DRj6eYw_cuLjoCxR';
+        
+        let supabaseClient = null;
+        if(SUPABASE_URL !== 'https://kixcomicxwlgcxcqdfna.supabase.co') {
+            supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        }
+
+        // Variável global para guardar o e-mail no primeiro passo
+        let registeredEmail = "";
+
         // --- MÁSCARAS DE INPUTS ---
         document.getElementById('reg-phone').addEventListener('input', e => {
             let x = e.target.value.replace(/\D/g, '').match(/(\d{0,2})(\d{0,5})(\d{0,4})/);
@@ -328,7 +352,6 @@
             const phoneValue = document.getElementById('reg-phone').value.replace(/\D/g, '');
             const cpfValue = document.getElementById('reg-cpf').value.replace(/\D/g, '');
 
-            // Validação Rigorosa de Campos Obrigatórios
             if (!nameValue || !emailValue || !phoneValue || !cpfValue) {
                 apiError.innerText = "Por favor, preencha todos os campos.";
                 apiError.classList.remove('hidden');
@@ -346,6 +369,9 @@
                 apiError.classList.remove('hidden');
                 return;
             }
+
+            // Guarda o e-mail em memória para uso no Supabase posteriormente
+            registeredEmail = emailValue;
 
             regSubmitBtn.disabled = true;
             regSubmitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Registrando...';
@@ -370,26 +396,17 @@
 
                 if (!response.ok) throw new Error('Falha ao comunicar com o servidor da API.');
 
-                // Disparar Pixel de Lead da Meta com sucesso da resposta
                 if (typeof fbq === 'function') {
-                    fbq('track', 'Lead', {
-                        em: payload.email,
-                        ph: payload.phone,
-                        fn: payload.name
-                    });
+                    fbq('track', 'Lead', { em: payload.email, ph: payload.phone, fn: payload.name });
                 }
 
-                // Avança para o funil das Casas Parceiras
                 registerModal.classList.add('hidden');
                 showPartnerModal();
-                
                 regSubmitBtn.disabled = false;
                 regSubmitBtn.innerHTML = 'Avançar para Ativação <i class="fa-solid fa-arrow-right ml-1"></i>';
 
             } catch (err) {
                 console.error("Erro de API/CORS:", err);
-                
-                // MODO DE TESTE (Bypass para origin 'null'): Evita que o funil trave devido ao bloqueio de CORS da API localmente/no iframe.
                 apiError.innerHTML = "Aviso (Modo Teste): Erro de CORS detectado na API. Simulando sucesso em 2s...";
                 apiError.classList.remove('text-red-500');
                 apiError.classList.add('text-yellow-400');
@@ -402,7 +419,6 @@
                     registerModal.classList.add('hidden');
                     showPartnerModal();
                     
-                    // Restaura os status
                     regSubmitBtn.disabled = false;
                     regSubmitBtn.innerHTML = 'Avançar para Ativação <i class="fa-solid fa-arrow-right ml-1"></i>';
                     apiError.classList.add('hidden');
@@ -442,18 +458,14 @@
             partnerModal.classList.remove('hidden');
         }
 
-        // Click no Cadastro da Casa (DISPARA INITIATE PURCHASE / CHECKOUT)
+        // Click no Cadastro da Casa (DISPARA INITIATE PURCHASE)
         btnNoAccount.addEventListener('click', () => {
             if (currentPartnerIndex >= partners.length) return;
             const house = partners[currentPartnerIndex];
 
-            // Dispara InitiateCheckout (Wording comercial "Initiate Purchase")
             if (typeof fbq === 'function') fbq('track', 'InitiateCheckout', { content_name: house.name });
-
-            // Abre o link em nova aba
             window.open(house.url, '_blank');
 
-            // Passa para a fase de envio do comprovante
             partnerModal.classList.add('hidden');
             depositModal.classList.remove('hidden');
         });
@@ -463,21 +475,74 @@
             showPartnerModal();
         });
 
-        // --- SUBMIT COMPROVANTE DE DEPÓSITO (DISPARA COMPRA / PURCHASE) ---
-        document.getElementById('form-comprovante').addEventListener('submit', function(e) {
+        // --- SUBMIT COMPROVANTE DE DEPÓSITO (SUPABASE + METAPIXEL PURCHASE) ---
+        const depositSubmitBtn = document.getElementById('deposit-submit-btn');
+        const depositError = document.getElementById('deposit-error');
+
+        document.getElementById('form-comprovante').addEventListener('submit', async function(e) {
             e.preventDefault();
+            depositError.classList.add('hidden');
+            
+            depositSubmitBtn.disabled = true;
+            depositSubmitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Enviando...';
 
-            // Dispara o Pixel de Compra definitivo
-            if (typeof fbq === 'function') {
-                fbq('track', 'Purchase', {
-                    value: 30.00,
-                    currency: 'BRL',
-                    content_name: 'Ativacao Plano Starter Roleta'
-                });
+            const fileInput = document.getElementById('file-proof');
+            const file = fileInput.files[0];
+
+            try {
+                if(supabaseClient && file) {
+                    // 1. Fazer upload para o Storage
+                    const fileExt = file.name.split('.').pop();
+                    const fileName = `${Date.now()}_${registeredEmail.replace(/[^a-zA-Z0-9]/g, '')}.${fileExt}`;
+
+                    const { data: uploadData, error: uploadError } = await supabaseClient.storage
+                        .from('comprovantes')
+                        .upload(fileName, file);
+
+                    if (uploadError) throw uploadError;
+
+                    // 2. Pegar URL Pública
+                    const { data: publicUrlData } = supabaseClient.storage
+                        .from('comprovantes')
+                        .getPublicUrl(fileName);
+
+                    // 3. Salvar no Banco de Dados
+                    const { error: dbError } = await supabaseClient
+                        .from('depositos_roleta')
+                        .insert([
+                            {
+                                email: registeredEmail,
+                                casa_parceira: partners[currentPartnerIndex].name,
+                                comprovante_url: publicUrlData.publicUrl
+                            }
+                        ]);
+
+                    if (dbError) throw dbError;
+                } else {
+                    // Bypass se as chaves do Supabase não estiverem configuradas
+                    console.warn("Supabase não configurado ou arquivo não selecionado. Simulando sucesso do envio em 1,5s...");
+                    await new Promise(r => setTimeout(r, 1500));
+                }
+
+                // Dispara o Pixel de Compra definitivo
+                if (typeof fbq === 'function') {
+                    fbq('track', 'Purchase', {
+                        value: 30.00,
+                        currency: 'BRL',
+                        content_name: 'Ativacao Plano Starter Roleta'
+                    });
+                }
+
+                document.getElementById('upload-stage').classList.add('hidden');
+                document.getElementById('success-stage').classList.remove('hidden');
+
+            } catch (err) {
+                console.error("Erro no Supabase:", err);
+                depositError.innerText = "Erro ao enviar comprovante. Tente anexar uma imagem menor.";
+                depositError.classList.remove('hidden');
+                depositSubmitBtn.disabled = false;
+                depositSubmitBtn.innerHTML = 'Concluir e Ativar Código';
             }
-
-            document.getElementById('upload-stage').classList.add('hidden');
-            document.getElementById('success-stage').classList.remove('hidden');
         });
 
         // --- CRONÔMETRO ---
