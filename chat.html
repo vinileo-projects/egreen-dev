@@ -277,8 +277,15 @@
         // --- MÁSCARAS DE INPUT ---
         chatInput.addEventListener('input', (e) => {
             const step = FLOW_STEPS[currentStepIndex];
-            if (!step || !step.mask) return;
+            if (!step) return;
 
+            // 1. Valida se o botão "Enviar" deve estar ativo para TODOS os campos (Nome, Email, etc)
+            sendBtn.disabled = e.target.value.trim().length === 0;
+
+            // 2. Se não houver máscara neste step, paramos aqui
+            if (!step.mask) return;
+
+            // 3. Aplicação das máscaras
             let v = e.target.value.replace(/\D/g, '');
             
             if (step.mask === 'phone') {
@@ -292,9 +299,6 @@
                     return !p2 ? p1 : `${p1}.${p2}${p3 ? '.' + p3 : ''}${p4 ? '-' + p4 : ''}`;
                 });
             }
-            
-            // Valida se o botão "Enviar" deve estar ativo
-            sendBtn.disabled = e.target.value.trim().length === 0;
         });
 
         // --- MOTOR PRINCIPAL DO FLUXO ---
