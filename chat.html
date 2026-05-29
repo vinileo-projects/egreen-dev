@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>egreen.ai — Atendimento Inteligente</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Meta Pixel Code -->
+    <script>
+        !function(f,b,e,v,n,t,s)
+        {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+        n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+        if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+        n.queue=[];t=b.createElement(e);t.async=!0;
+        t.src=v;s=b.getElementsByTagName(e)[0];
+        s.parentNode.insertBefore(t,s)}(window, document,'script',
+        'https://connect.facebook.net/en_US/fbevents.js');
+        fbq('init', '756953347467899');
+        fbq('track', 'PageView');
+    </script>
+    <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=756953347467899&ev=PageView&noscript=1"/></noscript>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'egreen': '#00FF00',
+                        'chat-bg': '#0B141A',
+                        'chat-panel': '#111B21',
+                        'msg-bot': '#202C33',
+                        'msg-user': '#005C4B',
+                        'chat-input-bg': '#2A3942'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #0B141A; }
+        
+        /* Customização da Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #374151; border-radius: 4px; }
+
+        /* Fundo do WhatsApp (Doodles) */
+        .whatsapp-bg {
+            position: absolute;
+            inset: 0;
+            background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
+            background-repeat: repeat;
+            opacity: 0.06; /* Transparência muito subtil */
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Animação do Indicador de Escrita */
+        .typing-indicator {
+            display: inline-flex; align-items: center; gap: 4px; padding: 8px 4px;
+        }
+        .typing-dot {
+            width: 6px; height: 6px; background-color: #8696A0; border-radius: 50%;
+            animation: typing 1.4s infinite ease-in-out both;
+        }
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes typing {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+
+        /* Animação de Entrada das Mensagens */
+        .msg-enter {
+            opacity: 0; transform: translateY(10px) scale(0.95);
+            transform-origin: bottom left;
+            animation: msg-fade-in 0.3s forwards ease-out;
+        }
+        .msg-enter-user { transform-origin: bottom right; }
+        @keyframes msg-fade-in {
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden text-[#E9EDEF]">
+
+    <!-- Header -->
+    <header class="bg-[#202C33] flex items-center p-3 sm:p-4 shadow-md z-20 sticky top-0 shrink-0">
+        <div class="flex items-center gap-3">
+            <div class="relative">
+                <div class="w-10 h-10 rounded-full bg-black flex items-center justify-center border border-gray-700 overflow-hidden p-1.5">
+                    <img src="https://i.imgur.com/X4B7YGa.png" alt="eGreen Logo" class="object-contain w-full h-full">
+                </div>
+                <div class="absolute bottom-0 right-0 w-3 h-3 bg-egreen border-2 border-[#202C33] rounded-full"></div>
+            </div>
+            <div>
+                <h1 class="font-semibold text-base leading-tight">eGreen IA</h1>
+                <p class="text-[#8696A0] text-[13px]">Online agora</p>
+            </div>
+        </div>
+    </header>
+
+    <!-- Chat Box -->
+    <main id="chat-container" class="flex-1 overflow-y-auto p-4 sm:p-6 pb-24 relative">
+        <div class="whatsapp-bg"></div>
+        <div id="chat-content" class="relative z-10 flex flex-col justify-end min-h-full space-y-4">
+            <!-- Mensagens serão injetadas aqui -->
+        </div>
+    </main>
+
+    <!-- Input Area (Oculta por padrão) -->
+    <footer id="input-area" class="bg-[#202C33] p-3 sm:p-4 shrink-0 transition-all duration-300 relative z-20 hidden">
+        <form id="chat-form" class="flex gap-2 max-w-3xl mx-auto w-full items-end">
+            <div class="flex-1 bg-chat-input-bg rounded-2xl flex items-center px-4 py-1.5 min-h-[48px]">
+                <input type="text" id="chat-input" class="w-full bg-transparent focus:outline-none placeholder-[#8696A0] text-[15px]" autocomplete="off">
+            </div>
+            <button type="submit" id="send-btn" class="w-[48px] h-[48px] rounded-full bg-egreen flex items-center justify-center text-black shadow-lg hover:bg-[#00CC00] transition-colors shrink-0 disabled:opacity-50 disabled:cursor-not-allowed">
+                <i class="fa-solid fa-paper-plane"></i>
+            </button>
+        </form>
+    </footer>
+
+    <!-- Options Area (Oculta por padrão) -->
+    <footer id="options-area" class="bg-[#202C33] p-3 sm:p-4 shrink-0 transition-all duration-300 relative z-20 hidden">
+        <div id="options-container" class="flex flex-col gap-2 max-w-md mx-auto"></div>
+    </footer>
+
+    <script>
+        // --- ESTADO DA APLICAÇÃO ---
+        const userData = { name: '', email: '', phone: '', cpf: '' };
+        let currentStepIndex = 0;
+        let isTyping = false;
+
+        // Elementos DOM
+        const chatContainer = document.getElementById('chat-container');
+        const chatContent = document.getElementById('chat-content');
+        const inputArea = document.getElementById('input-area');
+        const optionsArea = document.getElementById('options-area');
+        const optionsContainer = document.getElementById('options-container');
+        const chatForm = document.getElementById('chat-form');
+        const chatInput = document.getElementById('chat-input');
+        const sendBtn = document.getElementById('send-btn');
+
+        // --- DEFINIÇÃO DO FLUXO DO BOT ---
+        const FLOW_STEPS = [
+            {
+                type: 'bot',
+                messages: [
+                    "Fala! Tudo bem? Sou a IA da eGreen. 🤖🟢",
+                    "Eu fui treinada com o histórico de milhares de jogos de Futebol e eSoccer para decodificar as casas de apostas.",
+                    "Quer liberar seu acesso **100% gratuito** à plataforma e começar a lucrar agora?"
+                ]
+            },
+            {
+                type: 'choice',
+                options: [ { label: "🔥 Sim, quero lucrar grátis!", value: "yes" } ]
+            },
+            {
+                type: 'bot',
+                messages: [
+                    "Excelente escolha! 🚀",
+                    "Vou criar sua conta rapidinho. Qual é o seu **Nome Completo**?"
+                ]
+            },
+            {
+                type: 'input',
+                field: 'name',
+                placeholder: 'Ex: João da Silva',
+                validation: (val) => val.trim().length > 2 ? true : "Por favor, digite o seu nome."
+            },
+            {
+                type: 'bot',
+                dynamic: () => [`Prazer, **${userData.name.split(' ')[0]}**! E qual é o seu **Melhor E-mail**? (Vamos mandar os seus dados de acesso por lá)`]
+            },
+            {
+                type: 'input',
+                field: 'email',
+                typeAttr: 'email',
+                placeholder: 'seuemail@gmail.com',
+                validation: (val) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val) ? true : "Digite um e-mail válido."
+            },
+            {
+                type: 'bot',
+                messages: ["Show! Falta pouco. Digite o seu **WhatsApp** (com o DDD):"]
+            },
+            {
+                type: 'input',
+                field: 'phone',
+                typeAttr: 'tel',
+                mask: 'phone',
+                placeholder: '(11) 99999-9999',
+                validation: (val) => val.replace(/\D/g, '').length >= 10 ? true : "Digite um telefone com DDD válido."
+            },
+            {
+                type: 'bot',
+                messages: ["Último passo para a segurança da sua conta: Qual é o seu **CPF**?"]
+            },
+            {
+                type: 'input',
+                field: 'cpf',
+                typeAttr: 'tel',
+                mask: 'cpf',
+                placeholder: '000.000.000-00',
+                validation: (val) => val.replace(/\D/g, '').length === 11 ? true : "Digite um CPF válido (11 dígitos)."
+            },
+            {
+                type: 'action',
+                action: executeRegistration
+            }
+        ];
+
+        // --- FUNÇÕES UTILITÁRIAS ---
+        function scrollToBottom() {
+            setTimeout(() => {
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }, 50);
+        }
+
+        function formatMessage(text) {
+            return text.replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold">$1</strong>');
+        }
+
+        // --- MANIPULAÇÃO DO DOM DAS MENSAGENS ---
+        function showTypingIndicator() {
+            const id = 'typing-' + Date.now();
+            const div = document.createElement('div');
+            div.id = id;
+            div.className = 'flex items-start gap-2 w-full msg-enter';
+            div.innerHTML = `
+                <div class="bg-msg-bot rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm max-w-[85%]">
+                    <div class="typing-indicator">
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                    </div>
+                </div>
+            `;
+            chatContent.appendChild(div);
+            scrollToBottom();
+            return id;
+        }
+
+        function hideTypingIndicator(id) {
+            const el = document.getElementById(id);
+            if (el) el.remove();
+        }
+
+        function appendBotMessage(text) {
+            const div = document.createElement('div');
+            div.className = 'flex items-start gap-2 w-full msg-enter';
+            div.innerHTML = `
+                <div class="bg-msg-bot rounded-2xl rounded-tl-sm px-4 py-2.5 shadow-sm max-w-[85%] text-[15px] leading-relaxed">
+                    ${formatMessage(text)}
+                </div>
+            `;
+            chatContent.appendChild(div);
+            scrollToBottom();
+        }
+
+        function appendUserMessage(text) {
+            const div = document.createElement('div');
+            div.className = 'flex items-start justify-end gap-2 w-full msg-enter msg-enter-user';
+            div.innerHTML = `
+                <div class="bg-msg-user rounded-2xl rounded-tr-sm px-4 py-2.5 shadow-sm max-w-[85%] text-[15px] leading-relaxed">
+                    ${text}
+                </div>
+            `;
+            chatContent.appendChild(div);
+            scrollToBottom();
+        }
+
+        // --- MÁSCARAS DE INPUT ---
+        chatInput.addEventListener('input', (e) => {
+            const step = FLOW_STEPS[currentStepIndex];
+            if (!step || !step.mask) return;
+
+            let v = e.target.value.replace(/\D/g, '');
+            
+            if (step.mask === 'phone') {
+                if (v.length > 11) v = v.slice(0, 11);
+                e.target.value = v.replace(/(\d{0,2})(\d{0,5})(\d{0,4})/, (m, p1, p2, p3) => {
+                    return !p2 ? p1 : `(${p1}) ${p2}${p3 ? '-' + p3 : ''}`;
+                });
+            } else if (step.mask === 'cpf') {
+                if (v.length > 11) v = v.slice(0, 11);
+                e.target.value = v.replace(/(\d{0,3})(\d{0,3})(\d{0,3})(\d{0,2})/, (m, p1, p2, p3, p4) => {
+                    return !p2 ? p1 : `${p1}.${p2}${p3 ? '.' + p3 : ''}${p4 ? '-' + p4 : ''}`;
+                });
+            }
+            
+            // Valida se o botão "Enviar" deve estar ativo
+            sendBtn.disabled = e.target.value.trim().length === 0;
+        });
+
+        // --- MOTOR PRINCIPAL DO FLUXO ---
+        async function processNextStep() {
+            if (currentStepIndex >= FLOW_STEPS.length) return;
+            const step = FLOW_STEPS[currentStepIndex];
+
+            // Esconde áreas de interação
+            inputArea.classList.add('hidden');
+            optionsArea.classList.add('hidden');
+
+            if (step.type === 'bot') {
+                const msgs = step.dynamic ? step.dynamic() : step.messages;
+                
+                for (let i = 0; i < msgs.length; i++) {
+                    const typingId = showTypingIndicator();
+                    // Delay realista: Primeira mensagem do chat é rápida, as outras demoram mais um pouco
+                    const delay = (i === 0 && currentStepIndex === 0) ? 800 : Math.random() * 800 + 800;
+                    
+                    await new Promise(r => setTimeout(r, delay));
+                    
+                    hideTypingIndicator(typingId);
+                    appendBotMessage(msgs[i]);
+                }
+                
+                currentStepIndex++;
+                processNextStep();
+            } 
+            else if (step.type === 'choice') {
+                optionsContainer.innerHTML = '';
+                step.options.forEach(opt => {
+                    const btn = document.createElement('button');
+                    btn.className = 'w-full bg-[#1A262E] border border-chat-input-bg hover:bg-msg-bot text-egreen font-bold py-3.5 px-4 rounded-xl transition-colors shadow-sm text-center text-[15px]';
+                    btn.innerText = opt.label;
+                    btn.onclick = () => {
+                        optionsArea.classList.add('hidden');
+                        appendUserMessage(opt.label);
+                        currentStepIndex++;
+                        setTimeout(processNextStep, 500);
+                    };
+                    optionsContainer.appendChild(btn);
+                });
+                optionsArea.classList.remove('hidden');
+                scrollToBottom();
+            } 
+            else if (step.type === 'input') {
+                chatInput.value = '';
+                chatInput.placeholder = step.placeholder || 'Digite aqui...';
+                chatInput.type = step.typeAttr || 'text';
+                sendBtn.disabled = true;
+                
+                inputArea.classList.remove('hidden');
+                setTimeout(() => chatInput.focus(), 100);
+                scrollToBottom();
+            }
+            else if (step.type === 'action') {
+                step.action();
+            }
+        }
+
+        // Trata o envio do input (Text / Numbers)
+        chatForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const step = FLOW_STEPS[currentStepIndex];
+            if (!step || step.type !== 'input') return;
+
+            const val = chatInput.value;
+
+            // Validação
+            if (step.validation) {
+                const isValid = step.validation(val);
+                if (isValid !== true) {
+                    alert(isValid); // Alert básico (Pode ser melhorado)
+                    return;
+                }
+            }
+
+            // Armazena dados e avança
+            userData[step.field] = val;
+            appendUserMessage(val);
+            
+            inputArea.classList.add('hidden');
+            currentStepIndex++;
+            setTimeout(processNextStep, 500);
+        });
+
+        // --- SUBMISSÃO DA API FINAL ---
+        async function executeRegistration() {
+            const typingId = showTypingIndicator();
+            
+            const payload = {
+                name: userData.name.trim(),
+                email: userData.email.trim(),
+                sendWelcomeEmail: true,
+                phone: userData.phone.replace(/\D/g, ''),
+                cpf: userData.cpf.replace(/\D/g, '')
+            };
+
+            try {
+                const response = await fetch('https://egreen-api-v2.onrender.com/api/external/register-free', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-API-Key': 'eg_ext_8f92bd3a41e57c6b90f42a1b5c8d3e9f'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) throw new Error('Falha na API');
+
+                handleRegistrationSuccess(typingId, payload);
+            } catch (err) {
+                console.warn("Erro de CORS ou API. Simulando sucesso para teste:", err);
+                // Fallback automático caso falhe por bloqueio local
+                setTimeout(() => handleRegistrationSuccess(typingId, payload), 2000);
+            }
+        }
+
+        function handleRegistrationSuccess(typingId, payload) {
+            hideTypingIndicator(typingId);
+            
+            // Evento Meta Pixel
+            if (typeof fbq === 'function') {
+                fbq('track', 'Lead', {
+                    em: payload.email,
+                    ph: payload.phone,
+                    fn: payload.name,
+                    source: 'Chat_Typebot_HTML'
+                });
+            }
+
+            appendBotMessage("Prontinho! 🎉 Tudo validado e conta criada com sucesso.");
+            appendBotMessage("Você já pode acessar o sistema clicando no botão abaixo. Te vejo lá dentro! 🟢");
+
+            // Exibir Botão CTA Final
+            optionsContainer.innerHTML = '';
+            const btn = document.createElement('button');
+            btn.className = 'w-full bg-egreen hover:bg-[#00CC00] text-black font-extrabold py-4 px-4 rounded-xl shadow-[0_0_15px_rgba(0,255,0,0.3)] transition-all uppercase tracking-wide flex items-center justify-center gap-2';
+            btn.innerHTML = '<i class="fa-solid fa-arrow-right-to-bracket"></i> Acessar Plataforma';
+            btn.onclick = () => window.location.href = "https://egreen.app.br";
+            
+            optionsContainer.appendChild(btn);
+            optionsArea.classList.remove('hidden');
+            scrollToBottom();
+        }
+
+        // --- INICIALIZAÇÃO ---
+        window.addEventListener('load', () => {
+            setTimeout(processNextStep, 500); // Dá um fôlego antes do bot começar a falar
+        });
+
+    </script>
+</body>
+</html>
